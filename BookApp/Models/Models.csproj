@@ -40,7 +40,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
     <Compile Include="DomainModels\Book.cs" />
     <Compile Include="DomainModels\User.cs" />
     <Compile Include="ExtendedModels\BookExtended.cs" />

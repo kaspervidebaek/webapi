@@ -33,10 +33,8 @@ namespace BookApp {
         protected void Application_Start() {
             RegisterIoC();
             AreaRegistration.RegisterAllAreas();
-            GlobalConfiguration.Configure(WebApiConfig.Register);
+            GlobalConfiguration.Configure(WebApiConfig.Register); 
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
-            RouteConfig.RegisterRoutes(RouteTable.Routes);
-            BundleConfig.RegisterBundles(BundleTable.Bundles);
 
             System.Web.Http.GlobalConfiguration.Configuration.DependencyResolver = new UnityDependencyResolver(_container);
             var formatters = System.Web.Http.GlobalConfiguration.Configuration.Formatters;
