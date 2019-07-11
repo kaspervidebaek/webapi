@@ -11,7 +11,7 @@ namespace BookApp.Helper {
     /// </summary>
     [Serializable]
     [DataContract]
-    public class APIException : Exception, IAPIException {
+    public class APIInputException : Exception, IAPIException {
         #region Public Serializable properties.
         /// <summary>
         /// Error Code
@@ -30,7 +30,7 @@ namespace BookApp.Helper {
         [DataMember]
         public HttpStatusCode HttpStatus { get; set; }
 
-        string reasonPhrase = "ApiException";
+        string reasonPhrase = "ApiInputException";
         /// <summary>
         /// 
         /// </summary>

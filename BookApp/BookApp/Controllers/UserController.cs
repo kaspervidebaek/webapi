@@ -2,13 +2,11 @@
 using Interfaces.Repositories;
 using Interfaces.Services;
 using Models.DomainModels;
-using Newtonsoft.Json.Serialization;
+using Models.ExtendedModels;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Formatting;
 using System.Web.Http;
 using System.Web.Http.Cors;
 
@@ -32,48 +30,48 @@ namespace BookApp.Controllers
 
         [HttpGet]
         [Route("GetUserById")]
-        public HttpResponseMessage GetUserById(Guid userId) {
+        public User GetUserById(Guid userId) {
             if (userId == null || userId == Guid.Empty)
-                throw new APIException() {
+                throw new APIInputException() {
                     ErrorCode = (int) HttpStatusCode.BadRequest,
                     ErrorDescription = "Bad Request. Provide valid userId guid. Can't be empty guid.",
                     HttpStatus = HttpStatusCode.BadRequest
                 };
             var user = UserService.GetUserById(userId);
             if (user != null)
-                return Request.CreateResponse(HttpStatusCode.OK, user, JsonFormatter);
+                return user;
             else
                 throw new APIDataException(4, "No user found", HttpStatusCode.NotFound);
         }
 
         [HttpPost]
         [Route("CreateUser")]
-        public HttpResponseMessage SaveUser([FromBody]User user) {
+        public User SaveUser([FromBody]User user) {
             if (user == null)
-                throw new APIException() {
+                throw new APIInputException() {
                     ErrorCode = (int) HttpStatusCode.BadRequest,
                     ErrorDescription = "Bad Request. Provide valid user object. Object can't be null.",
                     HttpStatus = HttpStatusCode.BadRequest
                 };
             user = UserService.AddUser(user);
             if (user != null)
-                return Request.CreateResponse(HttpStatusCode.OK, user, JsonFormatter);
+                return user;
             else
                 throw new APIDataException(5, "Error Saving User", HttpStatusCode.NotFound);
         }
 
         [HttpPut]
         [Route("UpdateUser")]
-        public HttpResponseMessage UpdateUser([FromBody]User user) {
+        public User UpdateUser([FromBody]User user) {
             if (user == null)
-                throw new APIException() {
+                throw new APIInputException() {
                     ErrorCode = (int) HttpStatusCode.BadRequest,
                     ErrorDescription = "Bad Request. Provide valid user object. Object can't be null.",
                     HttpStatus = HttpStatusCode.BadRequest
                 };
             user = UserService.UpdateUser(user);
             if (user != null)
-                return Request.CreateResponse(HttpStatusCode.OK, user, JsonFormatter);
+                return user;
             else
                 throw new APIDataException(6, "Error Updating User", HttpStatusCode.NotFound);
         }
@@ -82,7 +80,7 @@ namespace BookApp.Controllers
         [Route("DeleteUser")]
         public HttpResponseMessage DeleteUser([FromBody]Guid userId) {
             if (userId == null || userId == Guid.Empty)
-                throw new APIException() {
+                throw new APIInputException() {
                     ErrorCode = (int) HttpStatusCode.BadRequest,
                     ErrorDescription = "Bad Request. Provide valid userId guid. Can't be empty guid.",
                     HttpStatus = HttpStatusCode.BadRequest
@@ -91,24 +89,24 @@ namespace BookApp.Controllers
             if (user != null) {
                 var result = UserService.DeleteUser(user);
                 if (result)
-                    return Request.CreateResponse(HttpStatusCode.OK, "Book was deleted", JsonFormatter);
+                    return Request.CreateResponse(HttpStatusCode.OK, "Book was deleted");
                 else
-                    throw new APIDataException(7, "Error Deleting User", HttpStatusCode.NotFound);
+                    throw new APIDataException(7, "Error Deleting User", HttpStatusCode.InternalServerError); // KV: This is not a notfound-scenario
             } else
                 throw new APIDataException(4, "No user found", HttpStatusCode.NotFound);
         }
 
         [HttpPost]
         [Route("CreateUserBook")]
-        public HttpResponseMessage SaveBook([FromUri]Guid userId, [FromBody]Book book) {
+        public Book SaveBook([FromUri]Guid userId, [FromBody]Book book) {
             if (book == null)
-                throw new APIException() {
+                throw new APIInputException() {
                     ErrorCode = (int) HttpStatusCode.BadRequest,
                     ErrorDescription = "Bad Request. Provide valid book object. Object can't be null.",
                     HttpStatus = HttpStatusCode.BadRequest
                 };
             if (userId == null || userId == Guid.Empty)
-                throw new APIException() {
+                throw new APIInputException() {
                     ErrorCode = (int) HttpStatusCode.BadRequest,
                     ErrorDescription = "Bad Request. Provide valid userId guid. Can't be empty guid.",
                     HttpStatus = HttpStatusCode.BadRequest
@@ -117,43 +115,28 @@ namespace BookApp.Controllers
             BookRepository.SaveChanges();
             var result = BookRepository.GetBookByID(book.Id);
             if (result != null)
-                return Request.CreateResponse(HttpStatusCode.OK, result, JsonFormatter);
+                return result;
             else
                 throw new APIDataException(2, "Error Saving Book", HttpStatusCode.NotFound);
         }
 
         [HttpGet]
         [Route("GetUserBooks")]
-        public HttpResponseMessage GetUserBooks(Guid userId) {
+        public IEnumerable<BookExtended> GetUserBooks(Guid userId) {
             if (userId == null || userId == Guid.Empty)
-                throw new APIException() {
+                throw new APIInputException() {
                     ErrorCode = (int) HttpStatusCode.BadRequest,
                     ErrorDescription = "Bad Request. Provide valid userId guid. Can't be empty guid.",
                     HttpStatus = HttpStatusCode.BadRequest
                 };
             var books = BookService.GetBooksByUserId(userId);
             if (books != null)
-                return Request.CreateResponse(HttpStatusCode.OK, books, JsonFormatter);
+                return books;
             else
                 throw new APIDataException(1, "No books found", HttpStatusCode.NotFound);
         }
 
 
 
-        protected JsonMediaTypeFormatter JsonFormatter {
-            get {
-                var formatter = new JsonMediaTypeFormatter();
-                var json = formatter.SerializerSettings;
-
-                json.DateFormatHandling = Newtonsoft.Json.DateFormatHandling.IsoDateFormat;
-                json.DateTimeZoneHandling = Newtonsoft.Json.DateTimeZoneHandling.Utc;
-                json.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
-                json.Formatting = Newtonsoft.Json.Formatting.Indented;
-                json.ContractResolver = new CamelCasePropertyNamesContractResolver();
-                json.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
-                return formatter;
-            }
-
-        }
     }
 }

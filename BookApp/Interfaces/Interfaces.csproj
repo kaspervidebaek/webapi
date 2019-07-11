@@ -47,10 +47,9 @@
     <Compile Include="Services\IBookService.cs" />
     <Compile Include="Services\IUserService.cs" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\Models\Models.csproj">
-      <Project>{0792B3AB-0969-4F1C-B14A-B110980B0079}</Project>
+      <Project>{0792b3ab-0969-4f1c-b14a-b110980b0079}</Project>
       <Name>Models</Name>
     </ProjectReference>
   </ItemGroup>

@@ -238,7 +238,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helper\APIDataException.cs" />
-    <Compile Include="Helper\APIException.cs" />
+    <Compile Include="Helper\APIInputException.cs" />
     <Compile Include="Helper\IAPIException.cs" />
     <Compile Include="Helper\ServiceStatus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
